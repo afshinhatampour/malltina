@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Admin;
 
+use App\Events\OrderStatusChangeEvent;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Admin\Order\UpdateOrderRequest;
 use App\Models\Order;

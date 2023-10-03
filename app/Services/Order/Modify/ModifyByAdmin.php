@@ -2,6 +2,7 @@
 
 namespace App\Services\Order\Modify;
 
+use App\Events\OrderStatusChangeEvent;
 use App\Models\Order;
 
 class ModifyByAdmin implements OrderModifyInterface
@@ -19,7 +20,19 @@ class ModifyByAdmin implements OrderModifyInterface
      */
     public function do(): Order
     {
-        $this->order->update(['status' => $this->request['status']]);
+        $this->order->status === $this->request['status'] ?: $this->changeOrderStatus();
+
         return $this->order;
+    }
+
+    /**
+     * we can check order status change in order observer but personally prefer to don't use observer in project
+     * because observe can bring so much headache in logic
+     * @return void
+     */
+    protected function changeOrderStatus(): void
+    {
+        $this->order->update(['status' => $this->request['status']]);
+        event(new OrderStatusChangeEvent($this->order));
     }
 }
