@@ -16,7 +16,7 @@ class OrderController extends ApiController
      */
     public function index(): JsonResponse
     {
-        return $this->success('', Order::paginate(self::PER_PAGE));
+        return $this->success(trans('order.admin.index'), Order::paginate(self::PER_PAGE));
     }
 
     /**
@@ -25,7 +25,7 @@ class OrderController extends ApiController
      */
     public function show(Order $order): JsonResponse
     {
-        return $this->success('' ,$order);
+        return $this->success(trans('order.admin.show') ,$order);
     }
 
     /**
@@ -36,7 +36,7 @@ class OrderController extends ApiController
     public function update(UpdateOrderRequest $request, Order $order)
     {
         (OrderModifyFactory::make('admin', $order, $request->validated()))->do();
-        return $this->success('', []);
+        return $this->success(trans('order.admin.update'), []);
     }
 
     /**

@@ -13,7 +13,8 @@ class ProductController extends ApiController
      */
     public function index(): JsonResponse
     {
-        return $this->success('', Product::with('variations.options')->paginate(self::PER_PAGE));
+        return $this->success(trans('product.customer.index'),
+            Product::with('variations.options')->paginate(self::PER_PAGE));
     }
 
     /**
@@ -22,6 +23,6 @@ class ProductController extends ApiController
      */
     public function show(Product $product): JsonResponse
     {
-        return $this->success('', $product);
+        return $this->success(trans('product.customer.show'), $product);
     }
 }

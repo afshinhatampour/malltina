@@ -19,7 +19,8 @@ class OrderController extends ApiController
      */
     public function index()
     {
-        return $this->success('', Order::authUserOrders()->paginate(self::PER_PAGE));
+        return $this->success(trans('order.customer.index'),
+            Order::authUserOrders()->paginate(self::PER_PAGE));
     }
 
     /**
@@ -40,11 +41,13 @@ class OrderController extends ApiController
     public function show(Order $order)
     {
         Gate::authorize('isOwnerOfOrder', $order);
-        return $this->success('', $order);
+        return $this->success(trans('order.customer.show'), $order);
     }
 
     /**
-     * Update the specified resource in storage.
+     * @param UpdateOrderRequest $request
+     * @param Order $order
+     * @return void
      */
     public function update(UpdateOrderRequest $request, Order $order)
     {

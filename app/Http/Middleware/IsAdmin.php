@@ -23,6 +23,6 @@ class IsAdmin
          if (Gate::allows('isAdmin')) {
              return $next($request);
          }
-        return $this->fail('', Response::HTTP_UNAUTHORIZED);
+        return $this->fail(trans('auth.unauthorized'), Response::HTTP_UNAUTHORIZED);
     }
 }
