@@ -71,17 +71,12 @@ class ExampleTest extends TestCase
      */
     public function test_shop_view_products_list(): void
     {
-        $user = User::first();
-        $loginResponse = $this->post('/api/login',
-            [
-                'email'    => $user->email,
-                'password' => 'password'
-            ]);
-        $loginResponseContent = json_decode($loginResponse->content());
         $response = $this->get('/api/products', [
-            'Authorization' => 'Bearer ' . $loginResponseContent->data->token
+            'Authorization' => 'Bearer ' . $this->user_token(UserRoleEnums::CUSTOMER->value)
         ]);
         $response->assertStatus(Response::HTTP_OK);
+        $responseContent = json_decode($response->content());
+        $this->assertEquals($responseContent->message, trans('product.customer.index'));
     }
 
 
@@ -90,17 +85,12 @@ class ExampleTest extends TestCase
      */
     public function test_shop_view_product(): void
     {
-        $user = User::first();
-        $loginResponse = $this->post('/api/login',
-            [
-                'email'    => $user->email,
-                'password' => 'password'
-            ]);
-        $loginResponseContent = json_decode($loginResponse->content());
         $response = $this->get('/api/products/1', [
-            'Authorization' => 'Bearer ' . $loginResponseContent->data->token
+            'Authorization' => 'Bearer ' . $this->user_token(UserRoleEnums::CUSTOMER->value)
         ]);
         $response->assertStatus(Response::HTTP_OK);
+        $responseContent = json_decode($response->content());
+        $this->assertEquals($responseContent->message, trans('product.customer.show'));
     }
 
 
@@ -109,17 +99,12 @@ class ExampleTest extends TestCase
      */
     public function test_shop_view_orders_list(): void
     {
-        $user = User::first();
-        $loginResponse = $this->post('/api/login',
-            [
-                'email'    => $user->email,
-                'password' => 'password'
-            ]);
-        $loginResponseContent = json_decode($loginResponse->content());
         $response = $this->get('/api/orders', [
-            'Authorization' => 'Bearer ' . $loginResponseContent->data->token
+            'Authorization' => 'Bearer ' . $this->user_token(UserRoleEnums::CUSTOMER->value)
         ]);
         $response->assertStatus(Response::HTTP_OK);
+        $responseContent = json_decode($response->content());
+        $this->assertEquals($responseContent->message, trans('order.customer.index'));
     }
 
 
@@ -140,6 +125,8 @@ class ExampleTest extends TestCase
             'Authorization' => 'Bearer ' . $loginResponseContent->data->token
         ]);
         $response->assertStatus(Response::HTTP_OK);
+        $responseContent = json_decode($response->content());
+        $this->assertEquals($responseContent->message, trans('order.customer.show'));
     }
 
 
@@ -148,13 +135,6 @@ class ExampleTest extends TestCase
      */
     public function test_shop_store_order(): void
     {
-        $user = User::first();
-        $loginResponse = $this->post('/api/login',
-            [
-                'email'    => $user->email,
-                'password' => 'password'
-            ]);
-        $loginResponseContent = json_decode($loginResponse->content());
         $response = $this->post('/api/orders', [
             'product_id' => Product::first()->id,
             'variations' => [
@@ -164,7 +144,7 @@ class ExampleTest extends TestCase
                 ]
             ]
         ], [
-            'Authorization' => 'Bearer ' . $loginResponseContent->data->token
+            'Authorization' => 'Bearer ' . $this->user_token(UserRoleEnums::CUSTOMER->value)
         ]);
         $response->assertStatus(Response::HTTP_CREATED);
     }
@@ -203,15 +183,8 @@ class ExampleTest extends TestCase
      */
     public function test_admin_view_orders_list()
     {
-        $adminUser = User::where('role', UserRoleEnums::ADMIN->value)->first();
-        $loginResponse = $this->post('/api/login',
-            [
-                'email'    => $adminUser->email,
-                'password' => 'password'
-            ]);
-        $loginResponseContent = json_decode($loginResponse->content());
         $response = $this->get('/api/admin/orders', [
-            'Authorization' => 'Bearer ' . $loginResponseContent->data->token
+            'Authorization' => 'Bearer ' . $this->user_token(UserRoleEnums::ADMIN->value)
         ]);
         $response->assertStatus(Response::HTTP_OK);
     }
@@ -222,15 +195,8 @@ class ExampleTest extends TestCase
      */
     public function test_admin_view_order()
     {
-        $adminUser = User::where('role', UserRoleEnums::ADMIN->value)->first();
-        $loginResponse = $this->post('/api/login',
-            [
-                'email'    => $adminUser->email,
-                'password' => 'password'
-            ]);
-        $loginResponseContent = json_decode($loginResponse->content());
         $response = $this->get('/api/admin/orders/1', [
-            'Authorization' => 'Bearer ' . $loginResponseContent->data->token
+            'Authorization' => 'Bearer ' . $this->user_token(UserRoleEnums::ADMIN->value)
         ]);
         $response->assertStatus(Response::HTTP_OK);
     }
@@ -241,18 +207,11 @@ class ExampleTest extends TestCase
      */
     public function test_admin_update_order()
     {
-        $adminUser = User::where('role', UserRoleEnums::ADMIN->value)->first();
-        $loginResponse = $this->post('/api/login',
-            [
-                'email'    => $adminUser->email,
-                'password' => 'password'
-            ]);
-        $loginResponseContent = json_decode($loginResponse->content());
         $response = $this->put('/api/admin/orders/1',
             [
                 'status' => 'cancel'
             ], [
-                'Authorization' => 'Bearer ' . $loginResponseContent->data->token
+                'Authorization' => 'Bearer ' . $this->user_token(UserRoleEnums::ADMIN->value)
             ]);
         $response->assertStatus(Response::HTTP_OK);
     }
@@ -263,15 +222,8 @@ class ExampleTest extends TestCase
      */
     public function test_admin_delete_order()
     {
-        $adminUser = User::where('role', UserRoleEnums::ADMIN->value)->first();
-        $loginResponse = $this->post('/api/login',
-            [
-                'email'    => $adminUser->email,
-                'password' => 'password'
-            ]);
-        $loginResponseContent = json_decode($loginResponse->content());
         $response = $this->delete('/api/admin/orders/1', [], [
-            'Authorization' => 'Bearer ' . $loginResponseContent->data->token
+            'Authorization' => 'Bearer ' . $this->user_token(UserRoleEnums::ADMIN->value)
         ]);
         $this->assertEquals(null, Order::find(1));
         $response->assertStatus(Response::HTTP_OK);
@@ -283,15 +235,8 @@ class ExampleTest extends TestCase
      */
     public function test_no_admin_user_can_not_access_to_admin_panel(): void
     {
-        $adminUser = User::where('role', UserRoleEnums::CUSTOMER->value)->first();
-        $loginResponse = $this->post('/api/login',
-            [
-                'email'    => $adminUser->email,
-                'password' => 'password'
-            ]);
-        $loginResponseContent = json_decode($loginResponse->content());
         $response = $this->get('/api/admin/orders/1', [
-            'Authorization' => 'Bearer ' . $loginResponseContent->data->token
+            'Authorization' => 'Bearer ' . $this->user_token(UserRoleEnums::CUSTOMER->value)
         ]);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
@@ -302,15 +247,8 @@ class ExampleTest extends TestCase
      */
     public function test_admin_view_products_list(): void
     {
-        $adminUser = User::where('role', UserRoleEnums::ADMIN->value)->first();
-        $loginResponse = $this->post('/api/login',
-            [
-                'email'    => $adminUser->email,
-                'password' => 'password'
-            ]);
-        $loginResponseContent = json_decode($loginResponse->content());
         $response = $this->get('/api/admin/products', [
-            'Authorization' => 'Bearer ' . $loginResponseContent->data->token
+            'Authorization' => 'Bearer ' . $this->user_token(UserRoleEnums::ADMIN->value)
         ]);
         $response->assertStatus(Response::HTTP_OK);
     }
@@ -321,15 +259,8 @@ class ExampleTest extends TestCase
      */
     public function test_admin_view_product(): void
     {
-        $adminUser = User::where('role', UserRoleEnums::ADMIN->value)->first();
-        $loginResponse = $this->post('/api/login',
-            [
-                'email'    => $adminUser->email,
-                'password' => 'password'
-            ]);
-        $loginResponseContent = json_decode($loginResponse->content());
         $response = $this->get('/api/admin/products/1', [
-            'Authorization' => 'Bearer ' . $loginResponseContent->data->token
+            'Authorization' => 'Bearer ' . $this->user_token(UserRoleEnums::ADMIN->value)
         ]);
         $response->assertStatus(Response::HTTP_OK);
     }
@@ -340,13 +271,6 @@ class ExampleTest extends TestCase
      */
     public function test_admin_store_product(): void
     {
-        $adminUser = User::where('role', UserRoleEnums::ADMIN->value)->first();
-        $loginResponse = $this->post('/api/login',
-            [
-                'email'    => $adminUser->email,
-                'password' => 'password'
-            ]);
-        $loginResponseContent = json_decode($loginResponse->content());
         $response = $this->post('/api/admin/products',
             [
                 'title'      => 'sample product',
@@ -358,7 +282,7 @@ class ExampleTest extends TestCase
                     ]
                 ]
             ], [
-                'Authorization' => 'Bearer ' . $loginResponseContent->data->token
+                'Authorization' => 'Bearer ' . $this->user_token(UserRoleEnums::ADMIN->value)
             ]);
         $response->assertStatus(Response::HTTP_CREATED);
     }
@@ -369,13 +293,6 @@ class ExampleTest extends TestCase
      */
     public function test_admin_update_product(): void
     {
-        $adminUser = User::where('role', UserRoleEnums::ADMIN->value)->first();
-        $loginResponse = $this->post('/api/login',
-            [
-                'email'    => $adminUser->email,
-                'password' => 'password'
-            ]);
-        $loginResponseContent = json_decode($loginResponse->content());
         $response = $this->put('/api/admin/products/1',
             [
                 'title'      => 'sample product',
@@ -387,7 +304,7 @@ class ExampleTest extends TestCase
                     ]
                 ]
             ], [
-                'Authorization' => 'Bearer ' . $loginResponseContent->data->token
+                'Authorization' => 'Bearer ' . $this->user_token(UserRoleEnums::ADMIN->value)
             ]);
         $response->assertStatus(Response::HTTP_OK);
     }
@@ -398,15 +315,8 @@ class ExampleTest extends TestCase
      */
     public function test_admin_delete_product(): void
     {
-        $adminUser = User::where('role', UserRoleEnums::ADMIN->value)->first();
-        $loginResponse = $this->post('/api/login',
-            [
-                'email'    => $adminUser->email,
-                'password' => 'password'
-            ]);
-        $loginResponseContent = json_decode($loginResponse->content());
         $response = $this->delete('/api/admin/products/1', [], [
-            'Authorization' => 'Bearer ' . $loginResponseContent->data->token
+            'Authorization' => 'Bearer ' . $this->user_token(UserRoleEnums::ADMIN->value)
         ]);
         $response->assertStatus(Response::HTTP_NO_CONTENT);
     }
@@ -439,5 +349,43 @@ class ExampleTest extends TestCase
         // user relations
         $user = User::first();
         $this->assertInstanceOf(HasMany::class, $user->orders());
+    }
+
+    public function test_redirect_middleware()
+    {
+        $this->withExceptionHandling();
+        $response = $this->get('/api/orders');
+        $response->assertRedirect(route('login'));
+    }
+
+    public function test_exception_handler()
+    {
+        $user = User::find(2);
+        $loginResponse = $this->post('/api/login',
+            [
+                'email'    => $user->email,
+                'password' => 'password'
+            ]);
+        $loginResponseContent = json_decode($loginResponse->content());
+        $response = $this->get('/api/orders/1', [
+            'Authorization' => 'Bearer ' . $loginResponseContent->data->token
+        ]);
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
+    }
+
+    /**
+     * @param string $userRole
+     * @return mixed
+     */
+    public function user_token(string $userRole): mixed
+    {
+        $adminUser = User::where('role', $userRole)->first();
+        $loginResponse = $this->post('/api/login',
+            [
+                'email'    => $adminUser->email,
+                'password' => 'password'
+            ]);
+        $loginResponseContent = json_decode($loginResponse->content());
+        return $loginResponseContent->data->token;
     }
 }
